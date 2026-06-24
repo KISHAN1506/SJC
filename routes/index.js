@@ -1,4 +1,8 @@
 const express = require('express');
+const multer = require('multer');
+const { storage } = require('../cloudConfig');
+const upload = multer({ storage });
+
 const {
   homePage,
   collectionsPage,
@@ -7,6 +11,12 @@ const {
   contactPage,
   submitEnquiry,
 } = require('../controllers/pageController');
+
+const {
+  renderCertificatePage,
+  handleCertificateAuth,
+  handleCertificateUpload,
+} = require('../controllers/certificateController');
 
 const router = express.Router();
 
@@ -17,4 +27,10 @@ router.get('/about', aboutPage);
 router.get('/contact', contactPage);
 router.post('/enquiries', submitEnquiry);
 
+router.get('/certificate', renderCertificatePage);
+router.post('/certificate/auth', handleCertificateAuth);
+router.post('/certificate', upload.single('certificateFile'), handleCertificateUpload);
+
+
 module.exports = router;
+

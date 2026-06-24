@@ -1,0 +1,41 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container py-5">
+  <div class="row min-vh-50 align-items-center justify-content-center py-5">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+      <div class="card-surface p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="icon-pill mb-3" style="width: 4rem; height: 4rem; font-size: 1.6rem;">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <span class="eyebrow d-block mb-2">Access Control</span>
+          <h1 class="h3 font-manrope fw-bold text-brand" style="font-family: 'Manrope', sans-serif;">Unlock Verification Portal</h1>
+          <p class="text-muted-custom small mb-0">Please enter the admin password to view and manage internship certificates.</p>
+        </div>
+
+        <% if (error) { %>
+          <div class="alert alert-danger rounded-4 border-0 mb-4 p-3 text-center">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            Incorrect password. Please try again.
+          </div>
+        <% } %>
+
+        <form action="/certificate/auth" method="POST">
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Admin Password</label>
+            <input type="password" name="password" class="form-control form-control-lg" placeholder="••••••••" required autofocus>
+          </div>
+          <button type="submit" class="btn btn-brand btn-lg w-100 py-3 font-manrope fw-bold">
+            <i class="fa-solid fa-key me-2"></i>Unlock Portal
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .font-manrope {
+    font-family: 'Manrope', sans-serif !important;
+  }
+</style>

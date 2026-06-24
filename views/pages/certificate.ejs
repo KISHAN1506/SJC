@@ -1,0 +1,367 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container py-5">
+  <div class="section-heading text-center mx-auto mb-5">
+    <span class="eyebrow">Verification Portal</span>
+    <h1>Internship Certificate Verification</h1>
+    <p>Upload new certificates or verify existing student internship credentials below.</p>
+  </div>
+
+  <% if (uploadSuccess) { %>
+    <div class="alert alert-success rounded-4 border-0 mb-4 p-3 d-flex align-items-center justify-content-between">
+      <div>
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <strong>Success!</strong> Certificate has been uploaded and registered successfully.
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <div class="row g-4">
+    <!-- Left: Upload Form -->
+    <div class="col-lg-4">
+      <div class="card-surface p-4 p-md-4 position-sticky" style="top: 100px; z-index: 10;">
+        <h3 class="h4 mb-2 text-brand">Upload Certificate</h3>
+        <p class="text-muted-custom small mb-4">Add a new internship certificate to the verification system database.</p>
+
+        <form action="/certificate" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Student Name</label>
+            <input type="text" name="studentName" class="form-control" placeholder="e.g. John Doe" required>
+            <div class="invalid-feedback">Please enter the student's name.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">College / University</label>
+            <input type="text" name="collegeName" class="form-control" placeholder="e.g. XYZ University" required>
+            <div class="invalid-feedback">Please enter the college name.</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Certificate File (Image)</label>
+            <input type="file" name="certificateFile" class="form-control" accept="image/*" required>
+            <div class="invalid-feedback">Please select a certificate image file.</div>
+            <small class="text-muted-custom mt-1 d-block" style="font-size: 0.75rem;">Supported formats: JPG, PNG, WEBP</small>
+          </div>
+
+          <button type="submit" class="btn btn-brand w-100 py-2.5 fw-bold">
+            <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload Certificate
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right: Search & Certificates List -->
+    <div class="col-lg-8">
+      <div class="card-surface p-4">
+        <!-- Search bar -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-brand"><i class="fa-solid fa-magnifying-glass me-2"></i>Search Database</label>
+          <div class="input-group">
+            <input type="text" id="searchInput" class="form-control form-control-lg border-end-0" placeholder="Search by student name or college..." style="border-radius: 0.95rem 0 0 0.95rem;">
+            <span class="input-group-text bg-white border-start-0" style="border-radius: 0 0.95rem 0.95rem 0; border-color: rgba(182, 138, 58, 0.18);">
+              <i class="fa-solid fa-search text-muted-custom"></i>
+            </span>
+          </div>
+        </div>
+
+        <h3 class="h5 mb-3 text-brand">Registered Certificates (<span id="certificateCount"><%= certificates.length %></span>)</h3>
+
+        <!-- Certificates list container -->
+        <div class="row g-3" id="certificateGrid">
+          <% if (certificates.length === 0) { %>
+            <div class="col-12 text-center py-5 text-muted-custom" id="noResultsMsg">
+              <i class="fa-solid fa-folder-open display-4 mb-3 d-block text-muted"></i>
+              No certificates uploaded yet. Use the form on the left to add one!
+            </div>
+          <% } else { %>
+            <% certificates.forEach((cert) => { %>
+              <div class="col-sm-6 certificate-item" data-id="<%= cert._id %>" data-name="<%= cert.studentName.toLowerCase() %>" data-college="<%= cert.collegeName.toLowerCase() %>">
+                <div class="card h-100 border-0 shadow-sm p-3 certificate-card" style="border-radius: 1.2rem; cursor: pointer; transition: all 0.2s ease;">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="flex-shrink-0 position-relative rounded-3 border overflow-hidden" style="width: 70px; height: 70px;">
+                      <img src="<%= cert.image.url %>" alt="Thumbnail" class="w-100 h-100" style="object-fit: cover;">
+                      <div class="position-absolute inset-0 bg-dark bg-opacity-10 d-flex align-items-center justify-content-center opacity-0 hover-opacity-100 transition-opacity">
+                        <i class="fa-solid fa-eye text-white"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                      <h4 class="h6 mb-1 text-truncate text-brand font-manrope font-weight-700" style="font-family: 'Manrope', sans-serif;"><%= cert.studentName %></h4>
+                      <p class="text-muted-custom text-truncate small mb-1"><i class="fa-solid fa-graduation-cap me-1"></i><%= cert.collegeName %></p>
+                      <span class="badge text-bg-light border" style="font-size: 0.7rem;"><%= new Date(cert.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+            
+            <div class="col-12 text-center py-5 text-muted-custom d-none" id="noResultsMsg">
+              <i class="fa-solid fa-magnifying-glass-minus display-4 mb-3 d-block text-muted"></i>
+              No matching certificates found.
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Lightbox Modal -->
+<div class="fullscreen-overlay" id="fullscreenOverlay">
+  <button class="overlay-close" id="overlayCloseBtn">&times;</button>
+  <div class="overlay-content">
+    <div class="overlay-card p-3 p-md-4">
+      <div class="text-center mb-3">
+        <h2 id="modalStudentName" class="h3 mb-1 text-brand">Student Name</h2>
+        <p id="modalCollegeName" class="text-muted-custom mb-0"><i class="fa-solid fa-graduation-cap me-1"></i>College Name</p>
+      </div>
+      <div class="overlay-img-container border rounded-3 overflow-hidden bg-light">
+        <img id="modalImage" src="" alt="Certificate Full View">
+      </div>
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <a id="modalDownloadBtn" href="" download class="btn btn-outline-brand btn-sm">
+          <i class="fa-solid fa-download me-1"></i>Download Image
+        </a>
+        <button id="modalShareBtn" class="btn btn-brand btn-sm">
+          <i class="fa-solid fa-share-nodes me-1"></i>Copy Share Link
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .font-manrope {
+    font-family: 'Manrope', sans-serif !important;
+  }
+  
+  .certificate-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(67, 34, 18, 0.12) !important;
+    border: 1px solid rgba(184, 137, 59, 0.25) !important;
+  }
+
+  /* Fullscreen Overlay styles */
+  .fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(42, 32, 25, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .fullscreen-overlay.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  .overlay-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 50px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 2001;
+    transition: transform 0.2s ease;
+  }
+
+  .overlay-close:hover {
+    transform: scale(1.1);
+    color: var(--sjc-gold);
+  }
+
+  .overlay-content {
+    max-width: 90%;
+    max-height: 90%;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+
+  .fullscreen-overlay.show .overlay-content {
+    transform: scale(1);
+  }
+
+  .overlay-card {
+    background: #fff;
+    border-radius: 1.8rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .overlay-img-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .overlay-img-container img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  @media (max-width: 768px) {
+    .overlay-card {
+      border-radius: 1.2rem;
+    }
+    .overlay-img-container {
+      max-height: 50vh;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Search function
+    const searchInput = document.getElementById('searchInput');
+    const items = document.querySelectorAll('.certificate-item');
+    const noResultsMsg = document.getElementById('noResultsMsg');
+    const certificateCount = document.getElementById('certificateCount');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        items.forEach(item => {
+          const name = item.getAttribute('data-name');
+          const college = item.getAttribute('data-college');
+
+          if (name.includes(query) || college.includes(query)) {
+            item.classList.remove('d-none');
+            visibleCount++;
+          } else {
+            item.classList.add('d-none');
+          }
+        });
+
+        if (certificateCount) {
+          certificateCount.textContent = visibleCount;
+        }
+
+        if (visibleCount === 0) {
+          noResultsMsg.classList.remove('d-none');
+        } else {
+          noResultsMsg.classList.add('d-none');
+        }
+      });
+    }
+
+    // Fullscreen Overlay / Lightbox Logic
+    const overlay = document.getElementById('fullscreenOverlay');
+    const closeBtn = document.getElementById('overlayCloseBtn');
+    const modalImage = document.getElementById('modalImage');
+    const modalStudentName = document.getElementById('modalStudentName');
+    const modalCollegeName = document.getElementById('modalCollegeName');
+    const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+    const modalShareBtn = document.getElementById('modalShareBtn');
+
+    // List of certificates raw data
+    const certificatesData = {};
+    <% if (certificates.length > 0) { %>
+      <% certificates.forEach(cert => { %>
+        certificatesData["<%= cert._id %>"] = {
+          id: "<%= cert._id %>",
+          studentName: "<%= cert.studentName %>",
+          collegeName: "<%= cert.collegeName %>",
+          imageUrl: "<%= cert.image.url %>"
+        };
+      <% }); %>
+    <% } %>
+
+    function openCertificateModal(certId) {
+      const data = certificatesData[certId];
+      if (!data) return;
+
+      modalImage.src = data.imageUrl;
+      modalStudentName.textContent = data.studentName;
+      modalCollegeName.innerHTML = `<i class="fa-solid fa-graduation-cap me-1"></i>${data.collegeName}`;
+      modalDownloadBtn.href = data.imageUrl;
+      
+      // Update share button data
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${data.id}`;
+      modalShareBtn.setAttribute('data-share-url', shareUrl);
+
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden'; // Disable page scrolling
+      
+      // Update URL search query without reloading
+      const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${data.id}`;
+      window.history.pushState({ path: newUrl }, '', newUrl);
+    }
+
+    function closeCertificateModal() {
+      overlay.classList.remove('show');
+      document.body.style.overflow = ''; // Enable page scrolling
+      
+      // Reset URL search query without reloading
+      const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+      window.history.pushState({ path: newUrl }, '', newUrl);
+    }
+
+    // Attach click events to card items
+    items.forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.getAttribute('data-id');
+        openCertificateModal(id);
+      });
+    });
+
+    // Close button click
+    closeBtn.addEventListener('click', closeCertificateModal);
+
+    // Click outside overlay-card to close
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closeCertificateModal();
+      }
+    });
+
+    // ESC key close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('show')) {
+        closeCertificateModal();
+      }
+    });
+
+    // Share link button click
+    modalShareBtn.addEventListener('click', () => {
+      const url = modalShareBtn.getAttribute('data-share-url');
+      navigator.clipboard.writeText(url).then(() => {
+        const originalText = modalShareBtn.innerHTML;
+        modalShareBtn.innerHTML = `<i class="fa-solid fa-check me-1"></i>Copied!`;
+        modalShareBtn.classList.remove('btn-brand');
+        modalShareBtn.classList.add('btn-success');
+        
+        setTimeout(() => {
+          modalShareBtn.innerHTML = originalText;
+          modalShareBtn.classList.remove('btn-success');
+          modalShareBtn.classList.add('btn-brand');
+        }, 2000);
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+    });
+
+    // Auto-open certificate from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedId = urlParams.get('id') || "<%= selectedId %>";
+    if (selectedId && certificatesData[selectedId]) {
+      openCertificateModal(selectedId);
+    }
+  });
+</script>
