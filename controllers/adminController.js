@@ -1,4 +1,5 @@
 const { createProduct, updateProduct, deleteProduct, getProductById, getProductsByOwner } = require('../models/productModel');
+const { getEnquiries } = require('../models/enquiryModel');
 
 function toCloudinaryImage(file, fallback = null) {
   if (file) {
@@ -15,6 +16,7 @@ async function renderAdminPage(req, res, next) {
   try {
     const loginError = req.query.error === 'login';
     const products = req.user ? await getProductsByOwner(req.user._id) : [];
+    const enquiries = req.user ? await getEnquiries() : [];
 
     res.render('pages/admin', {
       pageTitle: 'Admin',
@@ -22,6 +24,7 @@ async function renderAdminPage(req, res, next) {
       loginError,
       products,
       productToEdit: null,
+      enquiries,
     });
   } catch (error) {
     next(error);
@@ -36,12 +39,14 @@ async function renderEditPage(req, res, next) {
     }
 
     const products = req.user ? await getProductsByOwner(req.user._id) : [];
+    const enquiries = req.user ? await getEnquiries() : [];
     res.render('pages/admin', {
       pageTitle: 'Admin',
       activePage: 'admin',
       loginError: false,
       products,
       productToEdit: product,
+      enquiries,
     });
   } catch (error) {
     next(error);

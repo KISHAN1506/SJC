@@ -95,63 +95,129 @@
       </div>
 
       <div class="card-surface p-4 p-lg-5 mt-4" data-dashboard-panel>
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
-          <div>
-            <span class="eyebrow">Catalogue</span>
-            <h2 class="h4 mb-0 mt-2">All products</h2>
+        <ul class="nav nav-tabs border-bottom mb-4" id="adminTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active text-brand fw-semibold" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-pane" type="button" role="tab" aria-controls="products-pane" aria-selected="true">All Products</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link text-brand fw-semibold" id="enquiries-tab" data-bs-toggle="tab" data-bs-target="#enquiries-pane" type="button" role="tab" aria-controls="enquiries-pane" aria-selected="false">Customer Enquiries</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="adminTabsContent">
+          <div class="tab-pane fade show active" id="products-pane" role="tabpanel" aria-labelledby="products-tab" tabindex="0">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+              <div>
+                <span class="eyebrow">Catalogue</span>
+                <h2 class="h4 mb-0 mt-2">All products</h2>
+              </div>
+              <span class="badge text-bg-light border" data-edit-status>Create a new product</span>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Fabric</th>
+                    <th>MOQ</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody data-admin-table-body>
+                  <% products.forEach((product, index) => { %>
+                    <tr>
+                      <td><%= index + 1 %></td>
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          <img src="<%= (product.image && typeof product.image === 'object') ? product.image.url : product.image %>" alt="<%= product.name %>" width="64" height="64" class="rounded-3 border" style="object-fit: cover;">
+                          <div>
+                            <strong class="d-block"><%= product.name %></strong>
+                            <small class="text-muted-custom"><%= product.category %></small>
+                          </div>
+                        </div>
+                      </td>
+                      <td><%= product.fabric %></td>
+                      <td><%= product.moq %></td>
+                      <td><%= isNaN(Number(product.price)) || product.price === '' ? product.price : '₹' + Number(product.price).toLocaleString('en-IN') %></td>
+                      <td>
+                        <div class="d-flex flex-wrap gap-2">
+                          <form method="POST" action="/admin/products/<%= product.id %>?_method=PUT" class="d-inline">
+                            <input type="hidden" name="name" value="<%= product.name %>">
+                            <input type="hidden" name="category" value="<%= product.category %>">
+                            <input type="hidden" name="fabric" value="<%= product.fabric %>">
+                            <input type="hidden" name="price" value="<%= product.price %>">
+                            <input type="hidden" name="moq" value="<%= product.moq %>">
+                            <input type="hidden" name="occasion" value="<%= product.occasion %>">
+                            <input type="hidden" name="description" value="<%= product.description %>">
+                            <input type="hidden" name="image" value="<%= (product.image && typeof product.image === 'object') ? product.image.url : product.image %>">
+                            <button class="btn btn-outline-brand btn-sm" type="submit">Edit</button>
+                          </form>
+                          <form method="POST" action="/admin/products/<%= product.id %>?_method=DELETE" class="d-inline">
+                            <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <span class="badge text-bg-light border" data-edit-status>Create a new product</span>
-        </div>
-        <div class="table-responsive">
-          <table class="table align-middle">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Fabric</th>
-                <th>MOQ</th>
-                <th>Price</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody data-admin-table-body>
-              <% products.forEach((product, index) => { %>
-                <tr>
-                  <td><%= index + 1 %></td>
-                  <td>
-                    <div class="d-flex align-items-center gap-3">
-                      <img src="<%= (product.image && typeof product.image === 'object') ? product.image.url : product.image %>" alt="<%= product.name %>" width="64" height="64" class="rounded-3 border" style="object-fit: cover;">
-                      <div>
-                        <strong class="d-block"><%= product.name %></strong>
-                        <small class="text-muted-custom"><%= product.category %></small>
-                      </div>
-                    </div>
-                  </td>
-                  <td><%= product.fabric %></td>
-                  <td><%= product.moq %></td>
-                  <td><%= isNaN(Number(product.price)) || product.price === '' ? product.price : '₹' + Number(product.price).toLocaleString('en-IN') %></td>
-                  <td>
-                    <div class="d-flex flex-wrap gap-2">
-                      <form method="POST" action="/admin/products/<%= product.id %>?_method=PUT" class="d-inline">
-                        <input type="hidden" name="name" value="<%= product.name %>">
-                        <input type="hidden" name="category" value="<%= product.category %>">
-                        <input type="hidden" name="fabric" value="<%= product.fabric %>">
-                        <input type="hidden" name="price" value="<%= product.price %>">
-                        <input type="hidden" name="moq" value="<%= product.moq %>">
-                        <input type="hidden" name="occasion" value="<%= product.occasion %>">
-                        <input type="hidden" name="description" value="<%= product.description %>">
-                        <input type="hidden" name="image" value="<%= (product.image && typeof product.image === 'object') ? product.image.url : product.image %>">
-                        <button class="btn btn-outline-brand btn-sm" type="submit">Edit</button>
-                      </form>
-                      <form method="POST" action="/admin/products/<%= product.id %>?_method=DELETE" class="d-inline">
-                        <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              <% }) %>
-            </tbody>
-          </table>
+
+          <div class="tab-pane fade" id="enquiries-pane" role="tabpanel" aria-labelledby="enquiries-tab" tabindex="0">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+              <div>
+                <span class="eyebrow">Enquiries</span>
+                <h2 class="h4 mb-0 mt-2">All enquiries</h2>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Contact</th>
+                    <th>Enquiry Detail</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% enquiries.forEach((enquiry, index) => { %>
+                    <tr>
+                      <td><%= index + 1 %></td>
+                      <td>
+                        <strong class="d-block"><%= enquiry.name %></strong>
+                        <small class="text-muted-custom"><%= enquiry.businessName %></small>
+                      </td>
+                      <td>
+                        <a href="tel:+91<%= enquiry.phone.replace(/\D/g, '') %>" class="d-block text-decoration-none text-brand fw-semibold"><%= enquiry.phone %></a>
+                        <small class="text-muted-custom"><%= enquiry.city %></small>
+                      </td>
+                      <td>
+                        <span class="badge text-bg-light border mb-1"><%= enquiry.productInterest %></span>
+                        <div class="small">Qty: <strong><%= enquiry.quantity %></strong></div>
+                      </td>
+                      <td class="text-wrap" style="max-width: 250px;">
+                        <small class="text-muted-custom"><%= enquiry.message || 'No message provided' %></small>
+                      </td>
+                      <td>
+                        <small class="text-muted-custom"><%= new Date(enquiry.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></small>
+                      </td>
+                    </tr>
+                  <% }) %>
+                  <% if (enquiries.length === 0) { %>
+                    <tr>
+                      <td colspan="6" class="text-center py-4 text-muted-custom">No enquiries submitted yet.</td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     <% } %>

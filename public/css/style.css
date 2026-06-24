@@ -371,3 +371,27 @@ h4,
 .text-muted-custom {
   color: var(--sjc-muted) !important;
 }
+
+.nav-tabs {
+  border-bottom: 2px solid rgba(182, 138, 58, 0.1) !important;
+}
+
+.nav-tabs .nav-link {
+  border: none !important;
+  color: var(--sjc-muted) !important;
+  font-weight: 700 !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  transition: all 0.25s ease !important;
+  background-color: transparent !important;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--sjc-maroon) !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--sjc-maroon) !important;
+  border-bottom: 2px solid var(--sjc-maroon) !important;
+}
