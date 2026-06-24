@@ -1,0 +1,152 @@
+<% layout('layouts/boilerplate') %>
+<section class="py-5">
+  <div class="container">
+    <div class="section-heading mx-auto text-center">
+      <span class="eyebrow">Admin Access</span>
+      <h1>Manage catalogue products.</h1>
+      <p>Add, edit, and delete products in a proper MVC-backed admin screen.</p>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-5">
+        <div class="card-surface p-4 p-lg-5 h-100" data-login-panel>
+          <h2 class="h4">Login</h2>
+          <p class="text-muted-custom mb-4">Enter the admin password to unlock the dashboard.</p>
+          <form data-login-form>
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control form-control-lg" name="password" required>
+            <div class="d-grid mt-3">
+              <button class="btn btn-brand btn-lg" type="submit">Unlock Admin</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-7" data-dashboard-panel>
+        <div class="card-surface p-4 p-lg-5">
+          <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <div>
+              <span class="eyebrow">Product Manager</span>
+              <h2 class="h4 mb-0 mt-2">Add or update a product</h2>
+            </div>
+            <a href="/admin" class="btn btn-outline-brand btn-sm" data-logout-button>Logout</a>
+          </div>
+
+          <form method="POST" action="/admin/products" enctype="multipart/form-data" class="row g-3" data-admin-form>
+            <input type="hidden" name="id">
+            <input type="hidden" name="image" value="">
+            <div class="col-12">
+              <label class="form-label">Product Name</label>
+              <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Category</label>
+              <input type="text" name="category" class="form-control" placeholder="Silk, Cotton, Banarasi" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Fabric</label>
+              <input type="text" name="fabric" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Price</label>
+              <input type="number" min="1" name="price" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">MOQ</label>
+              <input type="text" name="moq" class="form-control" placeholder="12 pcs" required>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Occasion</label>
+              <input type="text" name="occasion" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              <textarea name="description" rows="3" class="form-control" required></textarea>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Image Upload</label>
+              <input type="file" class="form-control" name="imageFile" accept="image/*">
+              <small class="text-muted-custom">The file is converted to a data URL for storage in JSON.</small>
+            </div>
+            <div class="col-12">
+              <div class="admin-preview d-flex align-items-center gap-3" data-preview-box>
+                <img src="/images/product-designer.svg" alt="Preview" class="rounded-3" data-preview-image>
+                <div>
+                  <strong class="d-block">Preview</strong>
+                  <small class="text-muted-custom">Use the form to create a new product or edit an existing one.</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 d-flex gap-2 flex-wrap">
+              <button class="btn btn-brand" type="submit">Save Product</button>
+              <button class="btn btn-outline-brand" type="button" data-reset-form>Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-surface p-4 p-lg-5 mt-4" data-dashboard-panel>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+        <div>
+          <span class="eyebrow">Catalogue</span>
+          <h2 class="h4 mb-0 mt-2">All products</h2>
+        </div>
+        <span class="badge text-bg-light border" data-edit-status>Create a new product</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Fabric</th>
+              <th>MOQ</th>
+              <th>Price</th>
+              <th>Bestseller</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody data-admin-table-body>
+            <% products.forEach((product, index) => { %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    <img src="<%= product.image %>" alt="<%= product.name %>" width="64" height="64" class="rounded-3 border" style="object-fit: cover;">
+                    <div>
+                      <strong class="d-block"><%= product.name %></strong>
+                      <small class="text-muted-custom"><%= product.category %></small>
+                    </div>
+                  </div>
+                </td>
+                <td><%= product.fabric %></td>
+                <td><%= product.moq %></td>
+                <td>₹<%= Number(product.price).toLocaleString('en-IN') %></td>
+                <td><%= product.bestseller ? 'Yes' : 'No' %></td>
+                <td>
+                  <div class="d-flex flex-wrap gap-2">
+                    <form method="POST" action="/admin/products/<%= product.id %>?_method=PUT" class="d-inline">
+                      <input type="hidden" name="name" value="<%= product.name %>">
+                      <input type="hidden" name="category" value="<%= product.category %>">
+                      <input type="hidden" name="fabric" value="<%= product.fabric %>">
+                      <input type="hidden" name="price" value="<%= product.price %>">
+                      <input type="hidden" name="moq" value="<%= product.moq %>">
+                      <input type="hidden" name="occasion" value="<%= product.occasion %>">
+                      <input type="hidden" name="description" value="<%= product.description %>">
+                      <input type="hidden" name="image" value="<%= product.image %>">
+                      <button class="btn btn-outline-brand btn-sm" type="submit">Edit</button>
+                    </form>
+                    <form method="POST" action="/admin/products/<%= product.id %>?_method=DELETE" class="d-inline">
+                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
