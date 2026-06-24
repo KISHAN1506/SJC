@@ -190,6 +190,23 @@ h4,
   box-shadow: 0 28px 60px rgba(84, 59, 31, 0.16);
 }
 
+.product-card .card-body {
+  padding: 1.5rem 1.5rem 1.75rem 1.5rem;
+}
+
+.product-card .product-title {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.product-card .product-meta {
+  font-size: 0.88rem;
+  color: var(--sjc-muted);
+}
+
 .category-icon,
 .icon-pill {
   width: 3.2rem;
@@ -332,4 +349,12 @@ h4,
   .detail-image {
     min-height: 22rem;
   }
+}
+
+.text-brand {
+  color: var(--sjc-maroon) !important;
+}
+
+.text-muted-custom {
+  color: var(--sjc-muted) !important;
 }

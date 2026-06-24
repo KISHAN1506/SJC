@@ -38,9 +38,9 @@ const productSchema = new Schema(
       trim: true,
     },
     price: {
-      type: Number,
+      type: String,
       required: true,
-      min: 0,
+      trim: true,
     },
     featured: {
       type: Boolean,

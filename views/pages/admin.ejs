@@ -57,7 +57,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Price</label>
-                <input type="number" min="1" name="price" class="form-control" required>
+                <input type="text" name="price" class="form-control" required>
               </div>
               <div class="col-md-6">
                 <label class="form-label">MOQ</label>
@@ -129,7 +129,7 @@
                   </td>
                   <td><%= product.fabric %></td>
                   <td><%= product.moq %></td>
-                  <td>₹<%= Number(product.price).toLocaleString('en-IN') %></td>
+                  <td><%= isNaN(Number(product.price)) || product.price === '' ? product.price : '₹' + Number(product.price).toLocaleString('en-IN') %></td>
                   <td>
                     <div class="d-flex flex-wrap gap-2">
                       <form method="POST" action="/admin/products/<%= product.id %>?_method=PUT" class="d-inline">

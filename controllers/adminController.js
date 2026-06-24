@@ -56,7 +56,7 @@ async function create(req, res, next) {
 
     await createProduct({
       ...req.body,
-      price: Number(req.body.price),
+      price: req.body.price,
       image: toCloudinaryImage(req.file),
       gallery: [toCloudinaryImage(req.file)],
       owner: req.user._id,
@@ -80,7 +80,7 @@ async function update(req, res, next) {
     const updatedImage = req.file ? toCloudinaryImage(req.file) : existing.image;
     await updateProduct(req.params.id, {
       ...req.body,
-      price: Number(req.body.price),
+      price: req.body.price,
       image: updatedImage,
       gallery: [updatedImage],
       owner: req.user._id,
