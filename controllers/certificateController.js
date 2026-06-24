@@ -37,6 +37,11 @@ async function renderCertificatePage(req, res, next) {
     const uploadSuccess = req.query.success === 'true';
     const deleteSuccess = req.query.deleted === 'true';
     const updateSuccess = req.query.updated === 'true';
+    const adminPassword = req.session.certificateAuthPassword || '';
+
+    // IMMEDIATELY CLEAR THE SESSION VERIFICATION (locks page on refresh/next request)
+    req.session.certificateAdminVerified = false;
+    req.session.certificateAuthPassword = null;
 
     res.render('pages/certificate', {
       pageTitle: 'Internship Certificate Portal',
@@ -46,6 +51,7 @@ async function renderCertificatePage(req, res, next) {
       uploadSuccess,
       deleteSuccess,
       updateSuccess,
+      adminPassword,
     });
   } catch (error) {
     next(error);
@@ -59,6 +65,7 @@ async function handleCertificateAuth(req, res, next) {
 
     if (password === adminPassword) {
       req.session.certificateAdminVerified = true;
+      req.session.certificateAuthPassword = password;
       return res.redirect('/certificate');
     } else {
       return res.redirect('/certificate?error=auth');
@@ -70,9 +77,10 @@ async function handleCertificateAuth(req, res, next) {
 
 async function handleCertificateUpload(req, res, next) {
   try {
-    // Authorize upload
-    const isSessionVerified = req.session && req.session.certificateAdminVerified;
-    if (!isSessionVerified) {
+    // Authorize using the submitted password token
+    const adminPasswordInput = req.body.adminPassword;
+    const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
+    if (adminPasswordInput !== adminPassword) {
       return res.status(403).send('Unauthorized. You must be authenticated to upload certificates.');
     }
 
@@ -95,6 +103,11 @@ async function handleCertificateUpload(req, res, next) {
     };
 
     const newCertificate = await createCertificate(certificateData);
+
+    // Set temporary session verified flags for the redirect rendering
+    req.session.certificateAdminVerified = true;
+    req.session.certificateAuthPassword = adminPassword;
+
     res.redirect(`/certificate?success=true&id=${newCertificate._id}`);
   } catch (error) {
     next(error);
@@ -103,8 +116,10 @@ async function handleCertificateUpload(req, res, next) {
 
 async function destroyCertificate(req, res, next) {
   try {
-    const isSessionVerified = req.session && req.session.certificateAdminVerified;
-    if (!isSessionVerified) {
+    // Authorize using the submitted password token
+    const adminPasswordInput = req.body.adminPassword;
+    const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
+    if (adminPasswordInput !== adminPassword) {
       return res.status(403).send('Unauthorized. You must be authenticated to delete certificates.');
     }
 
@@ -123,6 +138,10 @@ async function destroyCertificate(req, res, next) {
       await deleteCertificate(id);
     }
 
+    // Set temporary session verified flags for the redirect rendering
+    req.session.certificateAdminVerified = true;
+    req.session.certificateAuthPassword = adminPassword;
+
     res.redirect('/certificate?deleted=true');
   } catch (error) {
     next(error);
@@ -131,8 +150,10 @@ async function destroyCertificate(req, res, next) {
 
 async function updateCertificateController(req, res, next) {
   try {
-    const isSessionVerified = req.session && req.session.certificateAdminVerified;
-    if (!isSessionVerified) {
+    // Authorize using the submitted password token
+    const adminPasswordInput = req.body.adminPassword;
+    const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
+    if (adminPasswordInput !== adminPassword) {
       return res.status(403).send('Unauthorized. You must be authenticated to edit certificates.');
     }
 
@@ -166,6 +187,11 @@ async function updateCertificateController(req, res, next) {
     }
 
     await updateCertificate(id, updateData);
+
+    // Set temporary session verified flags for the redirect rendering
+    req.session.certificateAdminVerified = true;
+    req.session.certificateAuthPassword = adminPassword;
+
     res.redirect('/certificate?updated=true');
   } catch (error) {
     next(error);
