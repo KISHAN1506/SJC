@@ -186,6 +186,34 @@ h4,
   border-radius: 1.8rem;
 }
 
+.info-card {
+  padding: 2.25rem 1.75rem;
+  border-radius: 1.5rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 60px rgba(84, 59, 31, 0.16);
+}
+
+.info-card h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.cta-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.5rem 3rem;
+  border-radius: 1.8rem;
+}
+
+
 .category-card,
 .product-card {
   height: 100%;
@@ -394,4 +422,8 @@ h4,
 .nav-tabs .nav-link.active {
   color: var(--sjc-maroon) !important;
   border-bottom: 2px solid var(--sjc-maroon) !important;
+}
+
+.bg-soft {
+  background-color: var(--sjc-cream);
 }
