@@ -21,7 +21,8 @@ html {
 
 body {
   font-family: "Manrope", sans-serif;
-  background: radial-gradient(circle at top left, rgba(184, 137, 59, 0.12), transparent 30%), radial-gradient(circle at top right, rgba(109, 31, 39, 0.08), transparent 24%), linear-gradient(180deg, #fffefc 0%, var(--sjc-cream) 100%);
+  background: #ffffff;
+  /* background: radial-gradient(circle at top left, rgba(184, 137, 59, 0.12), transparent 30%), radial-gradient(circle at top right, rgba(109, 31, 39, 0.08), transparent 24%), linear-gradient(180deg, #fffefc 0%, var(--sjc-cream) 100%); */
   color: var(--sjc-ink);
   min-height: 100vh;
 }

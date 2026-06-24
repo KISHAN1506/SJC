@@ -7,6 +7,7 @@ const express = require('express');
 const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
 const session = require('express-session');
+const MongoStore = require('connect-mongo').default;
 const passport = require('passport');
 const mongoose = require('mongoose');
 
@@ -26,10 +27,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '15mb' }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+const store = MongoStore.create({
+    mongoUrl: process.env.ATLASDB_URL,
+    crypto: {
+        secret: process.env.SECRET || process.env.SESSION_SECRET || 'shree-jagdamba-creation',
+    },
+    touchAfter: 24 * 3600, // 24 hours
+});
+
+store.on('error', (err) => {
+    console.log('ERROR IN MONGO SESSION STORE', err);
+});
+
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'shree-jagdamba-creation',
+    store,
+    secret: process.env.SECRET || process.env.SESSION_SECRET || 'shree-jagdamba-creation',
     resave: false,
     saveUninitialized: false,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
