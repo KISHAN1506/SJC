@@ -42,10 +42,9 @@ h4,
 }
 
 .navbar-sjc .navbar-brand img {
-  width: 2.6rem;
-  height: 2.6rem;
-  object-fit: cover;
-  border-radius: 0.8rem;
+  height: 3.2rem;
+  width: auto;
+  object-fit: contain;
 }
 
 .navbar-sjc .nav-link {
