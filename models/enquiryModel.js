@@ -52,7 +52,12 @@ function saveEnquiry(payload) {
   return Enquiry.create(payload);
 }
 
+function deleteEnquiry(id) {
+  return Enquiry.findByIdAndDelete(id);
+}
+
 module.exports = {
   getEnquiries,
   saveEnquiry,
+  deleteEnquiry,
 };

@@ -11,6 +11,7 @@ const {
   create,
   update,
   destroy,
+  deleteEnquiryController,
 } = require('../controllers/adminController');
 
 const { login, logout } = require('../controllers/authController');
@@ -30,5 +31,6 @@ router.get('/products/:id/edit', isLoggedIn, renderEditPage);
 router.post('/products', isLoggedIn, upload.array('imageFile', 10), create);
 router.put('/products/:id', isLoggedIn, upload.array('imageFile', 10), update);
 router.delete('/products/:id', isLoggedIn, destroy);
+router.delete('/enquiries/:id', isLoggedIn, deleteEnquiryController);
 
 module.exports = router;

@@ -183,6 +183,7 @@
                     <th>Enquiry Detail</th>
                     <th>Message</th>
                     <th>Date</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,11 +208,18 @@
                       <td>
                         <small class="text-muted-custom"><%= new Date(enquiry.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></small>
                       </td>
+                      <td>
+                        <form method="POST" action="/admin/enquiries/<%= enquiry.id %>?_method=DELETE" class="d-inline">
+                          <button class="btn btn-outline-success btn-sm" type="submit">
+                            <i class="fa-solid fa-check me-1"></i>Resolve
+                          </button>
+                        </form>
+                      </td>
                     </tr>
                   <% }) %>
                   <% if (enquiries.length === 0) { %>
                     <tr>
-                      <td colspan="6" class="text-center py-4 text-muted-custom">No enquiries submitted yet.</td>
+                      <td colspan="7" class="text-center py-4 text-muted-custom">No enquiries submitted yet.</td>
                     </tr>
                   <% } %>
                 </tbody>

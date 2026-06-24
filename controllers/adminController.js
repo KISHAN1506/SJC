@@ -1,5 +1,5 @@
 const { createProduct, updateProduct, deleteProduct, getProductById, getProductsByOwner } = require('../models/productModel');
-const { getEnquiries } = require('../models/enquiryModel');
+const { getEnquiries, deleteEnquiry } = require('../models/enquiryModel');
 
 function toCloudinaryImage(file, fallback = null) {
   if (file) {
@@ -115,10 +115,20 @@ async function destroy(req, res, next) {
   }
 }
 
+async function deleteEnquiryController(req, res, next) {
+  try {
+    await deleteEnquiry(req.params.id);
+    res.redirect('/admin');
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   renderAdminPage,
   renderEditPage,
   create,
   update,
   destroy,
+  deleteEnquiryController,
 };
