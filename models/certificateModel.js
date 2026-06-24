@@ -42,8 +42,18 @@ function getCertificateById(id) {
   return Certificate.findById(id);
 }
 
+function deleteCertificate(id) {
+  return Certificate.findByIdAndDelete(id);
+}
+
+function updateCertificate(id, payload) {
+  return Certificate.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+}
+
 module.exports = {
   getAllCertificates,
   createCertificate,
   getCertificateById,
+  deleteCertificate,
+  updateCertificate,
 };

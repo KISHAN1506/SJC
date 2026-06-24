@@ -17,6 +17,26 @@
     </div>
   <% } %>
 
+  <% if (typeof deleteSuccess !== 'undefined' && deleteSuccess) { %>
+    <div class="alert alert-success rounded-4 border-0 mb-4 p-3 d-flex align-items-center justify-content-between">
+      <div>
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <strong>Success!</strong> Certificate has been deleted successfully.
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <% if (typeof updateSuccess !== 'undefined' && updateSuccess) { %>
+    <div class="alert alert-success rounded-4 border-0 mb-4 p-3 d-flex align-items-center justify-content-between">
+      <div>
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <strong>Success!</strong> Certificate has been updated successfully.
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
   <div class="row g-4">
     <!-- Left: Upload Form -->
     <div class="col-lg-4">
@@ -24,7 +44,7 @@
         <h3 class="h4 mb-2 text-brand">Upload Certificate</h3>
         <p class="text-muted-custom small mb-4">Add a new internship certificate to the verification system database.</p>
 
-        <form action="/certificate" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form id="certificateForm" action="/certificate" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
           <div class="mb-3">
             <label class="form-label fw-semibold">Student Name</label>
             <input type="text" name="studentName" class="form-control" placeholder="e.g. John Doe" required>
@@ -85,10 +105,22 @@
                         <i class="fa-solid fa-eye text-white"></i>
                       </div>
                     </div>
-                    <div class="flex-grow-1 min-w-0">
-                      <h4 class="h6 mb-1 text-truncate text-brand font-manrope font-weight-700" style="font-family: 'Manrope', sans-serif;"><%= cert.studentName %></h4>
-                      <p class="text-muted-custom text-truncate small mb-1"><i class="fa-solid fa-graduation-cap me-1"></i><%= cert.collegeName %></p>
-                      <span class="badge text-bg-light border" style="font-size: 0.7rem;"><%= new Date(cert.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></span>
+                    <div class="flex-grow-1 min-w-0 d-flex align-items-center justify-content-between">
+                      <div class="min-w-0">
+                        <h4 class="h6 mb-1 text-truncate text-brand font-manrope font-weight-700" style="font-family: 'Manrope', sans-serif;"><%= cert.studentName %></h4>
+                        <p class="text-muted-custom text-truncate small mb-1"><i class="fa-solid fa-graduation-cap me-1"></i><%= cert.collegeName %></p>
+                        <span class="badge text-bg-light border" style="font-size: 0.7rem;"><%= new Date(cert.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></span>
+                      </div>
+                      <div class="flex-shrink-0 ms-2 d-flex gap-1" onclick="event.stopPropagation();">
+                        <button type="button" class="btn btn-outline-brand btn-sm p-1.5 edit-btn" data-id="<%= cert._id %>" data-name="<%= cert.studentName %>" data-college="<%= cert.collegeName %>" style="border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                          <i class="fa-solid fa-pen" style="font-size: 0.85rem;"></i>
+                        </button>
+                        <form action="/certificate/<%= cert._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Are you sure you want to delete this certificate?');" class="m-0">
+                          <button type="submit" class="btn btn-outline-danger btn-sm p-1.5" style="border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-trash-can" style="font-size: 0.85rem;"></i>
+                          </button>
+                        </form>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -362,6 +394,69 @@
     const selectedId = urlParams.get('id') || "<%= selectedId %>";
     if (selectedId && certificatesData[selectedId]) {
       openCertificateModal(selectedId);
+    }
+
+    // Edit Certificate Form Toggle Logic
+    const editButtons = document.querySelectorAll('.edit-btn');
+    const formTitle = document.querySelector('.card-surface h3');
+    const formDescription = document.querySelector('.card-surface p.text-muted-custom');
+    const uploadForm = document.getElementById('certificateForm');
+    
+    if (uploadForm && editButtons.length > 0) {
+      const studentNameInput = uploadForm.querySelector('input[name="studentName"]');
+      const collegeNameInput = uploadForm.querySelector('input[name="collegeName"]');
+      const fileInput = uploadForm.querySelector('input[name="certificateFile"]');
+      const submitBtn = uploadForm.querySelector('button[type="submit"]');
+
+      // Create cancel button element dynamically
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'btn btn-outline-brand w-100 mt-2 py-2 fw-bold';
+      cancelBtn.innerHTML = '<i class="fa-solid fa-xmark me-2"></i>Cancel Edit';
+      
+      function resetFormToUploadMode() {
+        uploadForm.action = '/certificate';
+        uploadForm.reset();
+        formTitle.textContent = 'Upload Certificate';
+        formDescription.textContent = 'Add a new internship certificate to the verification system database.';
+        submitBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload Certificate';
+        fileInput.setAttribute('required', 'required');
+        if (cancelBtn.parentNode) {
+          cancelBtn.parentNode.removeChild(cancelBtn);
+        }
+      }
+
+      editButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = btn.getAttribute('data-id');
+          const name = btn.getAttribute('data-name');
+          const college = btn.getAttribute('data-college');
+
+          // Switch form to Edit Mode
+          uploadForm.action = `/certificate/${id}?_method=PUT`;
+          studentNameInput.value = name;
+          collegeNameInput.value = college;
+          fileInput.value = ''; // Reset file input
+          fileInput.removeAttribute('required'); // File upload is optional during edit
+
+          formTitle.textContent = 'Edit Certificate';
+          formDescription.textContent = `Modify credentials for ${name}. Leave the certificate file blank to keep the current image.`;
+          submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk me-2"></i>Save Changes';
+
+          // Add cancel button if not already present
+          if (!cancelBtn.parentNode) {
+            submitBtn.parentNode.appendChild(cancelBtn);
+          }
+          
+          // Scroll to the form
+          window.scrollTo({
+            top: uploadForm.getBoundingClientRect().top + window.scrollY - 120,
+            behavior: 'smooth'
+          });
+        });
+      });
+
+      cancelBtn.addEventListener('click', resetFormToUploadMode);
     }
   });
 </script>

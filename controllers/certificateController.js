@@ -1,4 +1,4 @@
-const { getAllCertificates, createCertificate, getCertificateById } = require('../models/certificateModel');
+const { getAllCertificates, createCertificate, getCertificateById, deleteCertificate, updateCertificate } = require('../models/certificateModel');
 
 async function renderCertificatePage(req, res, next) {
   try {
@@ -36,6 +36,8 @@ async function renderCertificatePage(req, res, next) {
     // Already verified admin - render full database & upload form
     const certificates = await getAllCertificates();
     const uploadSuccess = req.query.success === 'true';
+    const deleteSuccess = req.query.deleted === 'true';
+    const updateSuccess = req.query.updated === 'true';
 
     res.render('pages/certificate', {
       pageTitle: 'Internship Certificate Portal',
@@ -43,6 +45,8 @@ async function renderCertificatePage(req, res, next) {
       certificates,
       selectedId,
       uploadSuccess,
+      deleteSuccess,
+      updateSuccess,
     });
   } catch (error) {
     next(error);
@@ -99,8 +103,83 @@ async function handleCertificateUpload(req, res, next) {
   }
 }
 
+async function destroyCertificate(req, res, next) {
+  try {
+    const isPassportAdmin = req.isAuthenticated && req.isAuthenticated();
+    const isSessionVerified = req.session && req.session.certificateAdminVerified;
+    if (!isPassportAdmin && !isSessionVerified) {
+      return res.status(403).send('Unauthorized. You must be authenticated to delete certificates.');
+    }
+
+    const { id } = req.params;
+    const { cloudinary } = require('../cloudConfig');
+    const cert = await getCertificateById(id);
+
+    if (cert) {
+      if (cert.image && cert.image.filename) {
+        try {
+          await cloudinary.uploader.destroy(cert.image.filename);
+        } catch (cloudinaryErr) {
+          console.error('Failed to delete image from Cloudinary:', cloudinaryErr);
+        }
+      }
+      await deleteCertificate(id);
+    }
+
+    res.redirect('/certificate?deleted=true');
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updateCertificateController(req, res, next) {
+  try {
+    const isPassportAdmin = req.isAuthenticated && req.isAuthenticated();
+    const isSessionVerified = req.session && req.session.certificateAdminVerified;
+    if (!isPassportAdmin && !isSessionVerified) {
+      return res.status(403).send('Unauthorized. You must be authenticated to edit certificates.');
+    }
+
+    const { id } = req.params;
+    const { studentName, collegeName } = req.body;
+    if (!studentName || !studentName.trim() || !collegeName || !collegeName.trim()) {
+      throw new Error('Student name and college name are required.');
+    }
+
+    const updateData = {
+      studentName: studentName.trim(),
+      collegeName: collegeName.trim(),
+    };
+
+    // If a new image file is uploaded, replace the old one
+    if (req.file) {
+      const { cloudinary } = require('../cloudConfig');
+      const cert = await getCertificateById(id);
+      if (cert && cert.image && cert.image.filename) {
+        try {
+          await cloudinary.uploader.destroy(cert.image.filename);
+        } catch (cloudinaryErr) {
+          console.error('Failed to delete old image from Cloudinary:', cloudinaryErr);
+        }
+      }
+
+      updateData.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
+    }
+
+    await updateCertificate(id, updateData);
+    res.redirect('/certificate?updated=true');
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   renderCertificatePage,
   handleCertificateAuth,
   handleCertificateUpload,
+  destroyCertificate,
+  updateCertificateController,
 };
