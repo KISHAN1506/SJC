@@ -18,6 +18,7 @@ const {
   handleCertificateUpload,
   destroyCertificate,
   updateCertificateController,
+  handleCertificateLogout,
 } = require('../controllers/certificateController');
 
 const router = express.Router();
@@ -30,6 +31,7 @@ router.get('/contact', contactPage);
 router.post('/enquiries', submitEnquiry);
 
 router.get('/certificate', renderCertificatePage);
+router.get('/certificate/logout', handleCertificateLogout);
 router.post('/certificate/auth', handleCertificateAuth);
 router.post('/certificate', upload.single('certificateFile'), handleCertificateUpload);
 router.put('/certificate/:id', upload.single('certificateFile'), updateCertificateController);

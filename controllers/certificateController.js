@@ -21,10 +21,9 @@ async function renderCertificatePage(req, res, next) {
     }
 
     // Case 2: Accessing the main page to upload or view the database (requires authentication)
-    const isPassportAdmin = req.isAuthenticated && req.isAuthenticated();
     const isSessionVerified = req.session && req.session.certificateAdminVerified;
 
-    if (!isPassportAdmin && !isSessionVerified) {
+    if (!isSessionVerified) {
       // Show password prompt
       return res.render('pages/certificate-login', {
         pageTitle: 'Verification Portal Login',
@@ -72,9 +71,8 @@ async function handleCertificateAuth(req, res, next) {
 async function handleCertificateUpload(req, res, next) {
   try {
     // Authorize upload
-    const isPassportAdmin = req.isAuthenticated && req.isAuthenticated();
     const isSessionVerified = req.session && req.session.certificateAdminVerified;
-    if (!isPassportAdmin && !isSessionVerified) {
+    if (!isSessionVerified) {
       return res.status(403).send('Unauthorized. You must be authenticated to upload certificates.');
     }
 
@@ -105,9 +103,8 @@ async function handleCertificateUpload(req, res, next) {
 
 async function destroyCertificate(req, res, next) {
   try {
-    const isPassportAdmin = req.isAuthenticated && req.isAuthenticated();
     const isSessionVerified = req.session && req.session.certificateAdminVerified;
-    if (!isPassportAdmin && !isSessionVerified) {
+    if (!isSessionVerified) {
       return res.status(403).send('Unauthorized. You must be authenticated to delete certificates.');
     }
 
@@ -134,9 +131,8 @@ async function destroyCertificate(req, res, next) {
 
 async function updateCertificateController(req, res, next) {
   try {
-    const isPassportAdmin = req.isAuthenticated && req.isAuthenticated();
     const isSessionVerified = req.session && req.session.certificateAdminVerified;
-    if (!isPassportAdmin && !isSessionVerified) {
+    if (!isSessionVerified) {
       return res.status(403).send('Unauthorized. You must be authenticated to edit certificates.');
     }
 
@@ -176,10 +172,18 @@ async function updateCertificateController(req, res, next) {
   }
 }
 
+function handleCertificateLogout(req, res) {
+  if (req.session) {
+    req.session.certificateAdminVerified = false;
+  }
+  res.redirect('/certificate');
+}
+
 module.exports = {
   renderCertificatePage,
   handleCertificateAuth,
   handleCertificateUpload,
   destroyCertificate,
   updateCertificateController,
+  handleCertificateLogout,
 };
