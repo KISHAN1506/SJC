@@ -50,15 +50,19 @@ async function renderEditPage(req, res, next) {
 
 async function create(req, res, next) {
   try {
-    if (!req.file) {
+    const files = req.files || [];
+    if (files.length === 0) {
       return res.redirect('/admin?error=login');
     }
+
+    const primaryImage = toCloudinaryImage(files[0]);
+    const galleryImages = files.map(file => toCloudinaryImage(file));
 
     await createProduct({
       ...req.body,
       price: req.body.price,
-      image: toCloudinaryImage(req.file),
-      gallery: [toCloudinaryImage(req.file)],
+      image: primaryImage,
+      gallery: galleryImages,
       owner: req.user._id,
       featured: req.body.featured === 'on' || req.body.featured === 'true',
       bestseller: req.body.bestseller === 'on' || req.body.bestseller === 'true',
@@ -77,12 +81,15 @@ async function update(req, res, next) {
       return res.redirect('/admin');
     }
 
-    const updatedImage = req.file ? toCloudinaryImage(req.file) : existing.image;
+    const files = req.files || [];
+    const updatedImage = files.length > 0 ? toCloudinaryImage(files[0]) : existing.image;
+    const updatedGallery = files.length > 0 ? files.map(file => toCloudinaryImage(file)) : existing.gallery;
+
     await updateProduct(req.params.id, {
       ...req.body,
       price: req.body.price,
       image: updatedImage,
-      gallery: [updatedImage],
+      gallery: updatedGallery,
       owner: req.user._id,
       featured: req.body.featured === 'on' || req.body.featured === 'true',
       bestseller: req.body.bestseller === 'on' || req.body.bestseller === 'true',

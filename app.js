@@ -71,7 +71,7 @@ async function start() {
     if (!adminUser) {
         adminUser = new User({
             username: 'admin',
-            email: 'admin@shreejagdambacreation.com',
+            email: 'rohitagarwal274@gmail.com',
             fullName: 'Admin User'
         });
         await User.register(adminUser, 'sjc2026');

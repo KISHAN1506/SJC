@@ -156,6 +156,19 @@ h4,
   box-shadow: var(--sjc-shadow);
 }
 
+.admin-preview {
+  border-radius: 1.2rem;
+  padding: 1.25rem;
+}
+
+.admin-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 0.85rem;
+  flex-shrink: 0;
+}
+
 .hero-metrics div,
 .stat-card {
   padding: 1rem 1.1rem;
