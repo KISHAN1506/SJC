@@ -1,39 +1,8 @@
 (() => {
-  const ADMIN_PASSWORD = 'sjc2026';
   document.addEventListener('DOMContentLoaded', () => {
-    const loginPanel = document.querySelector('[data-login-panel]');
-    const dashboardPanel = document.querySelector('[data-dashboard-panel]');
-    const loginForm = document.querySelector('[data-login-form]');
-    const logoutButton = document.querySelector('[data-logout-button]');
     const form = document.querySelector('[data-admin-form]');
     const previewImage = document.querySelector('[data-preview-image]');
     const resetButton = document.querySelector('[data-reset-form]');
-
-    const showDashboard = () => {
-      if (loginPanel) loginPanel.classList.add('d-none');
-      if (dashboardPanel) dashboardPanel.classList.remove('d-none');
-    };
-
-    const hideDashboard = () => {
-      if (loginPanel) loginPanel.classList.remove('d-none');
-      if (dashboardPanel) dashboardPanel.classList.add('d-none');
-    };
-
-    if (loginForm) {
-      loginForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const password = new FormData(loginForm).get('password');
-        if (password === ADMIN_PASSWORD) {
-          showDashboard();
-        } else {
-          window.alert('Incorrect password.');
-        }
-      });
-    }
-
-    if (logoutButton) {
-      logoutButton.addEventListener('click', () => hideDashboard());
-    }
 
     if (form) {
       const fileInput = form.querySelector('[name="imageFile"]');
