@@ -61,7 +61,7 @@ async function renderCertificatePage(req, res, next) {
 async function handleCertificateAuth(req, res, next) {
   try {
     const { password } = req.body;
-    const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
     if (password === adminPassword) {
       req.session.certificateAdminVerified = true;
@@ -79,7 +79,7 @@ async function handleCertificateUpload(req, res, next) {
   try {
     // Authorize using the submitted password token
     const adminPasswordInput = req.body.adminPassword;
-    const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
+    const adminPassword = process.env.ADMIN_PASSWORD;
     if (adminPasswordInput !== adminPassword) {
       return res.status(403).send('Unauthorized. You must be authenticated to upload certificates.');
     }
@@ -118,7 +118,7 @@ async function destroyCertificate(req, res, next) {
   try {
     // Authorize using the submitted password token
     const adminPasswordInput = req.body.adminPassword;
-    const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
+    const adminPassword = process.env.ADMIN_PASSWORD;
     if (adminPasswordInput !== adminPassword) {
       return res.status(403).send('Unauthorized. You must be authenticated to delete certificates.');
     }
@@ -152,7 +152,7 @@ async function updateCertificateController(req, res, next) {
   try {
     // Authorize using the submitted password token
     const adminPasswordInput = req.body.adminPassword;
-    const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
+    const adminPassword = process.env.ADMIN_PASSWORD;
     if (adminPasswordInput !== adminPassword) {
       return res.status(403).send('Unauthorized. You must be authenticated to edit certificates.');
     }

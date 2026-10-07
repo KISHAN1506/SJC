@@ -76,9 +76,7 @@ It is designed for wholesale enquiries rather than direct online checkout. Produ
 
 ## Default Admin Login
 
-The current client-side/admin password is:
-
-- `sjc2026`
+Configure the admin password using the `ADMIN_PASSWORD` environment variable in your `.env` file.
 
 ## Running the App
 

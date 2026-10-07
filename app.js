@@ -68,19 +68,20 @@ async function start() {
     // Ensure default admin user exists
     const User = require('./models/user');
     const adminPassword = process.env.ADMIN_PASSWORD || 'sjc2026';
-    let adminUser = await User.findOne({ username: 'admin' });
-    if (!adminUser) {
-        adminUser = new User({
-            username: 'admin',
-            email: 'rohitagarwal274@gmail.com',
-            fullName: 'Admin User'
-        });
-        await User.register(adminUser, adminPassword);
-        console.log('Default admin user registered.');
-    } else {
-        await adminUser.setPassword(adminPassword);
-        await adminUser.save();
-    }
+        let adminUser = await User.findOne({ username: 'admin' });
+        if (!adminUser) {
+            adminUser = new User({
+                username: 'admin',
+                email: 'rohitfashion2020@gmail.com',
+                fullName: 'Admin User'
+            });
+            await User.register(adminUser, adminPassword);
+            console.log('Default admin user registered.');
+        } else {
+            adminUser.email = 'rohitfashion2020@gmail.com';
+            await adminUser.setPassword(adminPassword);
+            await adminUser.save();
+        }
 
 
 
